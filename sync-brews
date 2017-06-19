@@ -1,46 +1,64 @@
 #!/bin/bash
-
+#
 # Sync Homebrew installations between Macs via Dropbox, including casks
 #
 
 BREW="/usr/local/bin/brew"
-DROPBOX="$HOME/Dropbox (Personal)"
+
+DROPBOX="$HOME/Dropbox (Personal)/Apps/Homebrew"
+TMPDIR="/tmp"
+
+TAPS_FILENAME="brew-sync.taps"
+BREWS_FILENAME="brew-sync.installed"
+CASKS_FILENAME="brew-sync.casks"
+
+LOCAL_TAPS="$TMPDIR/$TAPS_FILENAME"
+LOCAL_BREWS="$TMPDIR/$BREWS_FILENAME"
+LOCAL_CASKS="$TMPDIR/$CASKS_FILENAME"
+
+DROPBOX_TAPS="$DROPBOX/$TAPS_FILENAME"
+DROPBOX_BREWS="$DROPBOX/$BREWS_FILENAME"
+DROPBOX_CASKS="$DROPBOX/$CASKS_FILENAME"
 
 # First get local settings
 echo "Reading local settings ..."
 rm -f /tmp/brew-sync.*
-$BREW tap > /tmp/brew-sync.taps
-$BREW list -1 > /tmp/brew-sync.installed
-$BREW cask list -1 > /tmp/brew-sync.casks
+$BREW tap -1 > $LOCAL_TAPS
+$BREW list -1 > $LOCAL_BREWS
+$BREW cask list -1 > $LOCAL_CASKS
 
 # Then combine it with list in Dropbox
 echo "Reading settings from Dropbox ..."
-[ -e "$DROPBOX/Apps/Homebrew/brew-sync.taps" ] && cat "$DROPBOX/Apps/Homebrew/brew-sync.taps" >> /tmp/brew-sync.taps
-[ -e "$DROPBOX/Apps/Homebrew/brew-sync.installed" ] && cat "$DROPBOX/Apps/Homebrew/brew-sync.installed" >> /tmp/brew-sync.installed
-[ -e "$DROPBOX/Apps/Homebrew/brew-sync.casks" ] && cat "$DROPBOX/Apps/Homebrew/brew-sync.casks" >> /tmp/brew-sync.casks
+[ -e "$DROPBOX_TAPS" ]  && cat "$DROPBOX_TAPS"  >> $LOCAL_TAPS
+[ -e "$DROPBOX_BREWS" ] && cat "$DROPBOX_BREWS" >> $LOCAL_BREWS
+[ -e "$DROPBOX_CASKS" ] && cat "$DROPBOX_CASKS" >> $LOCAL_CASKS
 
 echo "Syncing to Dropbox ..."
 mkdir -p "$DROPBOX/Apps/Homebrew"
-cat /tmp/brew-sync.taps | sort | uniq > "$DROPBOX/Apps/Homebrew/brew-sync.taps"
-cat /tmp/brew-sync.installed | sort | uniq > "$DROPBOX/Apps/Homebrew/brew-sync.installed"
-cat /tmp/brew-sync.casks | sort | uniq > "$DROPBOX/Apps/Homebrew/brew-sync.casks"
+cat $LOCAL_TAPS  | sort | uniq > "$DROPBOX_TAPS"
+cat $LOCAL_BREWS | sort | uniq > "$DROPBOX_BREWS"
+cat $LOCAL_CASKS | sort | uniq > "$DROPBOX_CASKS"
 
 echo; echo "Enabling taps..."
-for TAP in `cat "$DROPBOX/Apps/Homebrew/brew-sync.taps"`; do
- echo -n "."
+for tap in `cat "$DROPBOX_TAPS"`; do
+ # echo -n "."
+ grep "$tap" "$LOCAL_TAPS" >/dev/null && echo -n "." || echo "Tap not installed: $tap\n"
 #  $BREW tap ${TAP} #>/dev/null
 done
 
 echo; echo "Install missing packages..."
-for PACKAGE in `cat "$DROPBOX/Apps/Homebrew/brew-sync.installed"`; do
-  echo -n "."
+# TODO get list of currently installed packages and only try to install if not present
+for package in `cat "$DROPBOX_BREWS"`; do
+  # echo -n "."
+  grep "$package" "$LOCAL_BREWS" >/dev/null && echo -n "." || echo "Brew not installed: $package\n"
 #  $BREW list ${PACKAGE} #>/dev/null
 #  [ "$?" != "0" ] && $BREW install ${PACKAGE}
 done
 
 echo; echo "Install missing casks..."
-for CASK in `cat "$DROPBOX/Apps/Homebrew/brew-sync.casks"`; do
-  echo -n "."
+for cask in `cat "$DROPBOX_CASKS"`; do
+  # echo -n "."
+  grep "$cask" "$LOCAL_CASKS" >/dev/null && echo -n "." || echo "Cask not installed: $cask\n"
 #  $BREW cask list -1 ${CASK} #>/dev/null
 #  [ "$?" != "0" ] && $BREW cask install ${CASK}
 done
