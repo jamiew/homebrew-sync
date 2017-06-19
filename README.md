@@ -9,9 +9,10 @@ Based on code by @witt3rd - https://gist.github.com/witt3rd/894c9e0b9ca4e24e5574
 
 Outstanding issues:
 
-* Hard-coded paths (most notably the location of your Dropbox folder)
+* Hard-coded paths, most notably the location of your Dropbox folder
 * Package re-installation is imperfect
 * No error handling either
+* Does not *remove* packages, only installs them
 
 
 Usage
