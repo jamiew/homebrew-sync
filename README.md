@@ -1,11 +1,13 @@
 homebrew-sync
 =========
 
+***Oct 2018: OBSOLETE/DEPRECATED/DO NOT USE***
+***`homebrew-bundle` and a global ~/.Brewfile are better***
+***just keep your ~/.Brewfile in Dropbox, perhaps using [mackup](https://github.com/lra/mackup)***
+
 Sync homebrew packages (including taps and casks) between computers using Dropbox
 
 Based on code by @witt3rd - https://gist.github.com/witt3rd/894c9e0b9ca4e24e5574
-
-**Work-in-progress, use at your own risk!**
 
 Outstanding issues:
 
