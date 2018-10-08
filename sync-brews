@@ -43,24 +43,29 @@ line_count() {
 # Taps first
 echo "Checking `line_count "$DROPBOX_TAPS"` taps..."
 for tap in `cat "$DROPBOX_TAPS"`; do
+  echo "$tap ..."
   grep "$tap" "$LOCAL_TAPS" >/dev/null && echo -n "." || echo "tap not installed: $tap\n"
-  # $BREW tap ${TAP} #>/dev/null
+  $BREW tap $tap
 done
 echo
 
 # Then brews
 echo "Checking `line_count "$DROPBOX_BREWS"` packages..."
 for package in `cat "$DROPBOX_BREWS"`; do
+  echo $package ...
   grep "$package" "$LOCAL_BREWS" >/dev/null && echo -n "." || echo "package not installed: $package\n" # TODO install it
   # [ "$?" != "0" ] && $BREW install ${PACKAGE}
+  $BREW install $package
 done
 echo
 
 # Then casks
 echo "Checking `line_count "$DROPBOX_CASKS"` casks..."
 for cask in `cat "$DROPBOX_CASKS"`; do
+  echo $cask ...
   grep "$cask" "$LOCAL_CASKS" >/dev/null && echo -n "." || echo "cask not installed: $cask\n"
   # [ "$?" != "0" ] && $BREW cask install ${CASK}
+  $BREW cask install $cask
 done
 echo
 
